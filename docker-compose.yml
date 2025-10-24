@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  tantei_fe:
+    container_name: tantei_fe
+    image: nahlsyareza/fe-jp-svelte
+    ports:
+      - "3002:3002"
+    networks:
+      - tantei
+  tantei_be:
+    container_name: tantei_be
+    image: nahlsyareza/be-jp-mongodb
+    ports:
+      - "3001:3001"
+    networks:
+      - tantei
+
+networks:
+  tantei:
+    driver: bridge
