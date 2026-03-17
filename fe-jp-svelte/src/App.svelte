@@ -15,6 +15,8 @@
   import SetSort from "./routes/SetSort.svelte";
   import Navbar from "./routes/Navbar.svelte";
 
+  // console.log(import.meta.env.VITE_TEST_ENV);
+
   const routes = {
     "/": Home,
     "/dictionary": Dictionary,

@@ -12,10 +12,16 @@
   let filterTranslation = "";
   let filterKanji = "";
   let markako = [];
+  let filterFilled = false;
 
-  let selectedSortType = "createdAt";
+  let filterSort = "createdAt";
+  let filterSortOptions = ["createdAt", "kanji", "latin"];
 
-  let optionsSortType = ["createdAt", "tabola", "bale", "nonae"];
+  let filterSortOrder = "-1";
+  let filterSortOrderOptions = ["1", "-1"];
+
+  let filterType = "";
+  let filterTypeOptions = ["", "adjective", "noun", "verb"];
 
   function nakaNi(e, f) {
     const ret = f.some((g) => {
@@ -26,7 +32,7 @@
   }
 
   function reapplySort() {
-    URL.get(`/word/getAll/${selectedSortType}?sort_type=-1`)
+    URL.get(`/word/getAll/${filterSort}?sort_type=${filterSortOrder}`)
       .then((e) => {
         const r = e.data;
         console.log(r);
@@ -36,7 +42,9 @@
   }
 
   onMount(async () => {
-    const getAll = await URL.get("/word/getAll");
+    const getAll = await URL.get(
+      `/word/getAll/${filterSort}?sort_type=${filterSortOrder}`
+    );
     const getLimit = await URL.get("/word/getLimit/5");
     const setContents = await URL.get(`/set/get/${params.set}?p=items`);
     console.log(getAll.data);
@@ -60,16 +68,29 @@
           type="text"
           placeholder="Translation"
         />
-        <select bind:value={selectedSortType} on:change={reapplySort}>
-          {#each optionsSortType as o}
+        <select bind:value={filterSort} on:change={reapplySort}>
+          {#each filterSortOptions as o}
             <option value={o}> {o} </option>
           {/each}
         </select>
+        <select bind:value={filterSortOrder} on:change={reapplySort}>
+          {#each filterSortOrderOptions as o}
+            <option value={o}> {o} </option>
+          {/each}
+        </select>
+        <select bind:value={filterType}>
+          {#each filterTypeOptions as o}
+            <option value={o}>{o}</option>
+          {/each}
+        </select>
+        <input type="checkbox" bind:checked={filterFilled} />
       </div>
       <ul class="space-y-4 text-white">
         {#each items as e, i}
-          <li class={`${nakaNi(e, included) ? "opacity-25" : "opacity-100"}`}>
-            {#if e.japanese.includes(filterJapanese.toLowerCase()) && e.latin.includes(filterLatin.toLowerCase()) && e.translation.includes(filterTranslation.toLowerCase()) && e.kanji.includes(filterKanji.toLowerCase())}
+          <li
+            class={`${nakaNi(e, included) || e.sets.length != 0 ? "opacity-25" : "opacity-100"}`}
+          >
+            {#if e.japanese.includes(filterJapanese.toLowerCase()) && e.latin.includes(filterLatin.toLowerCase()) && e.translation.includes(filterTranslation.toLowerCase()) && e.kanji.includes(filterKanji.toLowerCase()) && e.type.includes(filterType) && (filterFilled ? e.sets.length == 0 : true)}
               <button
                 on:click={async () => {
                   if (nakaNi(e, included)) {
@@ -110,6 +131,16 @@
                 <p>
                   {e.translation}
                 </p>
+                <p class="italic">{e.type}</p>
+                <div class="flex font-bold">
+                  <pre class="font-montserrat">Included in: </pre>
+                  <!-- {#if !e.sets}
+                    <p>None</p>
+                  {/if} -->
+                  {#each e.sets as s}
+                    <pre class="font-montserrat">{s.name} </pre>
+                  {/each}
+                </div>
                 <div class="bg-white h-0.5 w-full mt-4"></div>
               </button>
             {/if}

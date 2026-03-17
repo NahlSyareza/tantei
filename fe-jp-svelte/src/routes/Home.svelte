@@ -23,8 +23,8 @@
     .catch((e) => console.error(e));
 </script>
 
-<main class="w-full h-full bg-gray-700 font-montserrat">
-  <!-- <Navbar /> -->
+<main class="w-full h-full bg-[#FFFFEF]"></main>
+<!-- <main class="w-full h-full bg-gray-700 font-montserrat">
   <div class="text-white p-16 flex flex-col items-center space-y-8">
     {#if randomWords.length}
       <div class="space-y-3">
@@ -35,4 +35,4 @@
     {/if}
     <p class="text-xl">Random japanese words</p>
   </div>
-</main>
+</main> -->

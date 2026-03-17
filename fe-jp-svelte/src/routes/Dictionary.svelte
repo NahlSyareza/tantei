@@ -4,23 +4,22 @@
 
   let words = [];
 
-  // Deprecated
-  let letters = [];
   let filterJapanese = "";
   let filterLatin = "";
   let filterTranslation = "";
 
-  // Deprecated
-  let filterType = "words";
   let filterKanji = "";
   let filterClass = "";
 
-  let selectedSortType = "createdAt";
-  let optionsSortType = ["createdAt", "tabola", "bale", "nonae"];
+  let filterSort = "createdAt";
+  let filterSortOptions = ["createdAt", "kanji", "latin"];
+
+  let filterSortOrder = "-1";
+  let filterSortOrderOptions = ["1", "-1"];
 
   // Used to select the type of a kanji word
-  let filterTypeType = "";
-  let optionsTypeType = ["", "adjective", "noun", "verb"];
+  let filterType = "";
+  let filterTypeOptions = ["", "adjective", "noun", "verb"];
 
   function resetFilters() {
     filterJapanese = "";
@@ -30,7 +29,7 @@
   }
 
   function reapplySort() {
-    URL.get(`/word/getAll/${selectedSortType}?sort_type=-1`)
+    URL.get(`/word/getAll/${filterSort}?sort_type=${filterSortOrder}`)
       .then((e) => {
         const r = e.data;
         console.log(r);
@@ -38,22 +37,11 @@
       })
       .catch((e) => console.error(e));
   }
-
-  URL.get("/word/getAll")
+  URL.get(`/word/getAll/${filterSort}?sort_type=${filterSortOrder}`)
     .then((e) => {
       console.log(e.data);
       words = e.data.payload;
-    })
-    .catch((e) => {
-      console.error(e);
-    });
-
-  // Deprecated
-  URL.get("/letter/getAll")
-    .then((e) => {
-      const r = e.data;
-      console.log(r);
-      letters = r.payload;
+      console.log("Shot from /dictionary");
     })
     .catch((e) => {
       console.error(e);
@@ -63,25 +51,8 @@
 <main class="w-full h-auto flex flex-col font-montserrat bg-gray-700">
   <!-- <Navbar /> -->
   <div class="w-full h-auto flex flex-col p-16 bg-gray-700 space-y-4">
-    <div class="w-full text-white flex justify-evenly">
-      <button
-        on:click={() => {
-          resetFilters();
-          filterType = "words";
-        }}
-        class={`w-1/3 p-2 rounded-xl ${filterType === "words" ? "bg-sky-950" : "bg-sky-800"}`}
-        >Words</button
-      >
-      <button
-        on:click={() => {
-          resetFilters();
-          filterType = "letters";
-        }}
-        class={`w-1/3 p-2 rounded-xl ${filterType !== "words" ? "bg-sky-950" : "bg-sky-800"}`}
-        >Letters</button
-      >
-    </div>
-    {#if words.length && filterType === "words"}
+    <div class="w-full text-white flex justify-evenly"></div>
+    {#if words.length}
       <div class="space-x-2 text-black">
         <input bind:value={filterJapanese} type="text" placeholder="Kana" />
         <input bind:value={filterKanji} type="text" placeholder="Kanji" />
@@ -91,45 +62,40 @@
           type="text"
           placeholder="Translation"
         />
-        <select bind:value={selectedSortType} on:change={reapplySort}>
-          {#each optionsSortType as o}
+        <select bind:value={filterSort} on:change={reapplySort}>
+          {#each filterSortOptions as o}
             <option value={o}> {o} </option>
           {/each}
         </select>
-        <select bind:value={filterTypeType}>
-          {#each optionsTypeType as o}
+        <select bind:value={filterSortOrder} on:change={reapplySort}>
+          {#each filterSortOrderOptions as o}
+            <option value={o}> {o} </option>
+          {/each}
+        </select>
+        <select bind:value={filterType}>
+          {#each filterTypeOptions as o}
             <option value={o}>{o}</option>
           {/each}
         </select>
       </div>
       <ul class="space-y-4 text-white">
         {#each words as e}
-          {#if e.japanese.includes(filterJapanese.toLowerCase()) && e.latin.includes(filterLatin.toLowerCase()) && e.translation.includes(filterTranslation.toLowerCase()) && e.kanji.includes(filterKanji.toLowerCase()) && e.type.includes(filterTypeType.toLowerCase())}
+          {#if e.japanese.includes(filterJapanese.toLowerCase()) && e.latin.includes(filterLatin.toLowerCase()) && e.translation.includes(filterTranslation.toLowerCase()) && e.kanji.includes(filterKanji.toLowerCase()) && e.type.includes(filterType.toLowerCase())}
             <li>
               <p>{e.japanese}</p>
               <p>{e.kanji}</p>
               <p>{e.latin}</p>
               <p>{e.translation}</p>
               <p class="italic">{e.type}</p>
-              <div class="bg-white h-0.5 w-full mt-4"></div>
-            </li>
-          {/if}
-        {/each}
-      </ul>
-      <!-- Deprecated -->
-    {:else if letters.length && filterType == "letters"}
-      <div class="space-x-2 text-black">
-        <input bind:value={filterJapanese} type="text" placeholder="Japanese" />
-        <input bind:value={filterLatin} type="text" placeholder="Latin" />
-        <input bind:value={filterClass} type="text" placeholder="Class" />
-      </div>
-      <ul class="space-y-4 text-white">
-        {#each letters as e}
-          {#if e.japanese.includes(filterJapanese.toLowerCase()) && e.latin.includes(filterLatin.toLowerCase()) && e.clas.includes(filterClass.toLowerCase())}
-            <li>
-              <p>{e.japanese}</p>
-              <p>{e.latin}</p>
-              <p>{e.clas}</p>
+              <div class="flex font-bold">
+                <pre class="font-montserrat">Included in: </pre>
+                {#if e.sets == null}
+                  <p>None</p>
+                {/if}
+                {#each e.sets as s}
+                  <pre class="font-montserrat">{s.name} </pre>
+                {/each}
+              </div>
               <div class="bg-white h-0.5 w-full mt-4"></div>
             </li>
           {/if}
