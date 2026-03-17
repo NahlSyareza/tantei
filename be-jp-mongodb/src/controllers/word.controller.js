@@ -19,7 +19,7 @@ const add = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const d = await Word.find().lean();
+    const d = await Word.find().populate("sets", "name").lean();
     return res.status(200).json({
       success: true,
       msg: "Words retrieved!",
@@ -39,7 +39,8 @@ const getAllSorted = async (req, res) => {
       .lean()
       .sort({
         [sort]: parseInt(sort_type),
-      });
+      })
+      .populate("sets", "name");
     return res.status(200).json({
       success: true,
       msg: "Sorted words received!",
@@ -57,7 +58,7 @@ const get = async (req, res) => {
     let d;
 
     if (id) {
-      d = await Word.find({ _id: id });
+      d = await Word.find({ _id: id }).populate("sets", "name");
     } else {
       d = await Word.find();
     }

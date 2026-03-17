@@ -1,16 +1,17 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-// require("dotenv").config();
+require("dotenv").config();
 
 const word = require("./src/routes/word.route");
 const user = require("./src/routes/user.route");
 const set = require("./src/routes/set.route");
 const letter = require("./src/routes/letter.route");
+const translation = require("./src/routes/translation.route");
 
-const CONNECTION_STRING =
-  "mongodb://admin:FullAutoWHEELDRIVERS%24%24%24%25%25%25@100.117.82.121:27017/tantei?authSource=admin";
-const PORT = 3001;
+const CONNECTION_STRING = process.env.CONNECTION_STRING;
+
+const PORT = process.env.PORT;
 
 const app = express();
 
@@ -30,7 +31,8 @@ app.use(express.urlencoded());
 app.use("/word", word);
 app.use("/user", user);
 app.use("/set", set);
-app.use("/letter", letter);
+app.use("/translation", translation);
+// app.use("/letter", letter);
 
 app.get("/", async (req, res) => {
   return res.send("にほんごをわかります!");

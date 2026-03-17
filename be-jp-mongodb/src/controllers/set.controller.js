@@ -1,5 +1,6 @@
 const Letter = require("../models/LetterSchema");
 const { Set, WordSet, LetterSet } = require("../models/SetSchema");
+const Word = require("../models/WordSchema");
 
 const create = async (req, res) => {
   const { name, type, owner } = req.body;
@@ -63,6 +64,17 @@ const remove = async (req, res) => {
           { new: true }
         );
 
+        await Word.findOneAndUpdate(
+          {
+            _id: item,
+          },
+          {
+            $pull: {
+              sets: set,
+            },
+          }
+        );
+
         break;
 
       default:
@@ -115,6 +127,17 @@ const add = async (req, res) => {
             },
           },
           { new: true }
+        );
+
+        await Word.findOneAndUpdate(
+          {
+            _id: item,
+          },
+          {
+            $push: {
+              sets: set,
+            },
+          }
         );
         break;
 

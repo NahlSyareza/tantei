@@ -26,6 +26,12 @@ const WordSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    sets: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Set",
+      },
+    ],
   },
   {
     timestamps: true,
